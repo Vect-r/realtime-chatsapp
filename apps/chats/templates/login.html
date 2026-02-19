@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 
+            rounded-2xl shadow-2xl p-8">
+
+    <h2 class="text-3xl font-bold text-center mb-6">Welcome Back 👋</h2>
+
+    <form method="POST" class="space-y-5">
+        {% csrf_token %}
+
+        <!-- Non-field errors -->
+        {% if form.non_field_errors %}
+        <div class="bg-red-500/20 border border-red-400 rounded-lg p-3 text-sm">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div>
+            <label class="text-sm text-white/80">Username</label>
+            <input type="text" name="username" required
+                   class="w-full mt-1 px-4 py-2 rounded-xl bg-white/20 border border-white/20 outline-none">
+            {% if form.username.errors %}
+                <p class="text-red-300 text-sm mt-1">{{ form.username.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="relative">
+            <label class="text-sm text-white/80">Password</label>
+            <input id="loginPassword" type="password" name="password" required
+                   class="w-full mt-1 px-4 py-2 pr-12 rounded-xl bg-white/20 border border-white/20 outline-none">
+            <button type="button"
+                    onclick="togglePassword('loginPassword', this)"
+                    class="absolute right-3 top-9 text-white/70 hover:text-white text-lg">
+                👁️
+            </button>
+            {% if form.password.errors %}
+                <p class="text-red-300 text-sm mt-1">{{ form.password.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <button type="submit"
+                class="w-full bg-indigo-500 hover:bg-indigo-600 py-2 rounded-xl font-semibold 
+                       transition shadow-lg shadow-indigo-500/40">
+            Login
+        </button>
+    </form>
+
+    <p class="text-sm text-center mt-6 text-white/70">
+        Don’t have an account?
+        <a href="{% url 'register' %}" class="text-indigo-300 hover:underline">Register</a>
+    </p>
+</div>
+{% endblock %}

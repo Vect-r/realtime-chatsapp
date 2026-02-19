@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Chat App{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-white flex flex-col">
+
+    <!-- Navbar -->
+    <!-- Glass Navbar -->
+    <nav class="backdrop-blur-md bg-white/10 border-b border-white/20 shadow-lg relative z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wide">💬 ChatterBox</h1>
+
+            <div class="flex items-center space-x-4">
+                {% if request.isAuthenticated %}
+                <div class="relative">
+                    <button onclick="toggleDropdown()" class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center 
+                                   font-bold text-white shadow-lg hover:bg-indigo-600 transition">
+                        {{ request.authenticated_user.username|slice:":1"|upper }}
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-48 bg-white/10 backdrop-blur-lg 
+                                border border-white/20 rounded-xl shadow-xl overflow-hidden z-50">
+
+                        <div class="px-4 py-3 border-b border-white/10">
+                            <p class="text-sm text-white/70">Signed in as</p>
+                            <p class="font-semibold">{{ request.authenticated_user.username }}</p>
+                        </div>
+
+                        <a href="{% url 'logout' %}" class="block px-4 py-3 text-sm hover:bg-white/10 transition">
+                            🚪 Logout
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="px-4 py-2 rounded-lg hover:bg-white/20 transition">
+                    Login
+                </a>
+                <a href="{% url 'register' %}"
+                    class="px-4 py-2 bg-indigo-500 rounded-lg hover:bg-indigo-600 transition shadow">
+                    Register
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 space-y-2 w-full max-w-md">
+        {% for message in messages %}
+        <div class="px-4 py-3 rounded-xl shadow-lg backdrop-blur-md border
+            {% if message.tags == 'error' %}
+                bg-red-500/20 border-red-400
+            {% elif message.tags == 'success' %}
+                bg-green-500/20 border-green-400
+            {% elif message.tags == 'warning' %}
+                bg-yellow-500/20 border-yellow-400
+            {% else %}
+                bg-blue-500/20 border-blue-400
+            {% endif %}
+        ">
+            <p class="text-sm font-medium">{{ message }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Content -->
+    <main class="flex-grow flex items-center justify-center px-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-center text-sm text-white/70 py-4">
+        Built with Django • Real-time chats coming soon 🚀
+    </footer>
+
+    <!-- Password Toggle Script -->
+    <script>
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerText = "🙈";
+            } else {
+                input.type = "password";
+                btn.innerText = "👁️";
+            }
+        }
+    </script>
+
+    <script>
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerText = "🙈";
+            } else {
+                input.type = "password";
+                btn.innerText = "👁️";
+            }
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById("profileDropdown");
+            dropdown.classList.toggle("hidden");
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function (event) {
+            const dropdown = document.getElementById("profileDropdown");
+            if (!event.target.closest(".relative")) {
+                dropdown?.classList.add("hidden");
+            }
+        });
+    </script>
+
+    {% block javascript %}
+    {% endblock %}
+
+
+</body>
+
+</html>
