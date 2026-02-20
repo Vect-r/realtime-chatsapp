@@ -74,9 +74,10 @@
         {% if selected_user%}
         <div class="p-4 border-t border-white/20 bg-white/10">
             <form id="chat_message_form" class="flex gap-3" 
-                hx-post="{% url 'userChats' selected_user.id %}"
-                hx-target="#chat_messages"
-                hx-swap="beforeend">
+                hx-ext="ws"
+                ws-connect="/ws/chats/{{selected_user.id}}"
+                ws-send
+                _="on htmx:wsAfterSend reset() me">
                 {% csrf_token %}
                 {{form.content}}
                 <!-- <input type="text" name="message" placeholder="Type a message..."
@@ -93,4 +94,22 @@
 
     </div>
 </div>
+
+{% block javascript%}
+<script>
+function scrollChatToBottom() {
+    const container = document.getElementById("chat_messages");
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+    }
+}
+
+// Scroll after sending message
+document.body.addEventListener("htmx:wsAfterSend", scrollChatToBottom);
+
+// Scroll after receiving message via websocket
+document.body.addEventListener("htmx:wsAfterMessage", scrollChatToBottom);
+</script>
+{%endblock%}
+
 {% endblock %}

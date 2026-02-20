@@ -40,7 +40,7 @@ def chats(request,user_id=None):
             conversation=conversation
         ).select_related('sender').order_by('created_at')
 
-    if request.method == "POST":
+    if request.method == "POST" and request.headers.get("HX-Request"):
         form = SendMessageForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
@@ -48,14 +48,14 @@ def chats(request,user_id=None):
             message.receiver = receiver
             message.conversation = conversation
             message.save()
-            context={'msg':message}
-            return render(request,'partials/chat-pills-p.html',context)
+            return render(request,'partials/chat-pills-p.html',{'msg': message,'user':request.authenticated_user})
 
     context = {
         "conversations": conversations,
         "selected_user": selected_user,
         "chat_messages": messages,
-        "form":form
+        "form":form,
+        'user':request.authenticated_user
     }
     return render(request, "chat.html", context)
 

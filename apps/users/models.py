@@ -26,7 +26,7 @@ class Conversation(BaseClass):
     def get_other_user(self, current_user):
         return self.user2 if self.user1 == current_user else self.user1
     
-class Message(models.Model):
+class Message(BaseClass):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()

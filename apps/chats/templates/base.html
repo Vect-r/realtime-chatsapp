@@ -16,6 +16,23 @@
     </style>
 </head>
 
+<style>
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-bubble-animate {
+    animation: fadeInUp 0.25s ease-out;
+}
+</style>
+
 <body class="min-h-screen text-white flex flex-col">
 
     <!-- Navbar -->

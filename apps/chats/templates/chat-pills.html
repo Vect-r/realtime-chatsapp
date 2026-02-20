@@ -1,14 +1,14 @@
-{% if msg.sender == request.authenticated_user %}
+{% if msg.sender == user %}
 <!-- Sent -->
 <div class="flex justify-end">
-    <div class="bg-indigo-500 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-xs shadow">
+    <div class="bg-indigo-500 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-xs shadow chat-bubble-animate">
         {{ msg.content }}
     </div>
 </div>
 {% else %}
 <!-- Received -->
 <div class="flex justify-start">
-    <div class="bg-white/20 px-4 py-2 rounded-2xl rounded-bl-md max-w-xs shadow">
+    <div class="bg-white/20 px-4 py-2 rounded-2xl rounded-bl-md max-w-xs shadow chat-bubble-animate">
         {{ msg.content }}
     </div>
 </div>
