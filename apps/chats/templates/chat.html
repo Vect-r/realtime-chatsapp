@@ -12,16 +12,33 @@
 
         <!-- User List -->
         <div class="flex-1 overflow-y-auto">
-            {% for user in users %}
+            {% for conversation in conversations %}
+            {%if conversation.user1.id != request.authenticated_user.id%}
+            <a href="{% url 'userChats' conversation.user1.id %}">
             <div class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 cursor-pointer transition">
                 <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold">
-                    {{ user.username|slice:":1"|upper }}
+                    {{ conversation.user1.username|slice:":1"|upper }}
                 </div>
                 <div>
-                    <p class="font-semibold">{{ user.username }}</p>
+                    <p class="font-semibold">{{ conversation.user1.username }}</p>
                     <p class="text-xs text-white/60">Tap to chat</p>
                 </div>
             </div>
+            </a>
+            {%else%}
+            <a href="{% url 'userChats' conversation.user2.id %}">
+            <div class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 cursor-pointer transition">
+                <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold">
+                    {{ conversation.user2.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <p class="font-semibold">{{ conversation.user2.username }}</p>
+                    <p class="text-xs text-white/60">Tap to chat</p>
+                </div>
+            </div>
+            </a>
+            {%endif%}
+
             {% empty %}
             <p class="p-4 text-white/60">No users available</p>
             {% endfor %}
@@ -32,46 +49,39 @@
     <div class="flex-1 flex flex-col bg-white/5 backdrop-blur-md">
 
         <!-- Chat Header -->
+         {%if selected_user%}
         <div class="p-4 border-b border-white/20 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold">
                 U
             </div>
             <div>
-                <p class="font-semibold">Username</p>
+                <p class="font-semibold">{{selected_user.username}}</p>
                 <p class="text-xs text-green-300">Online</p>
             </div>
         </div>
+        {%endif%}
 
         <!-- Messages -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-3">
+        <div class="flex-1 overflow-y-auto p-6 space-y-3" id="chat_messages">
             {% for msg in chat_messages %}
-                {% if msg.sender.id == request.authenticated_user.id %}
-                    <!-- Sent -->
-                    <div class="flex justify-end">
-                        <div class="bg-indigo-500 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-xs shadow">
-                            {{ msg.content }}
-                        </div>
-                    </div>
-                {% else %}
-                    <!-- Received -->
-                    <div class="flex justify-start">
-                        <div class="bg-white/20 px-4 py-2 rounded-2xl rounded-bl-md max-w-xs shadow">
-                            {{ msg.content }}
-                        </div>
-                    </div>
-                {% endif %}
+                {% include 'chat-pills.html' %}
             {% empty %}
             <p class="text-center text-white/60 mt-10">Start the conversation 👋</p>
             {% endfor %}
         </div>
 
         <!-- Input -->
+        {% if selected_user%}
         <div class="p-4 border-t border-white/20 bg-white/10">
-            <form method="POST" class="flex gap-3">
+            <form id="chat_message_form" class="flex gap-3" 
+                hx-post="{% url 'userChats' selected_user.id %}"
+                hx-target="#chat_messages"
+                hx-swap="beforeend">
                 {% csrf_token %}
-                <input type="text" name="message" placeholder="Type a message..."
+                {{form.content}}
+                <!-- <input type="text" name="message" placeholder="Type a message..."
                        class="flex-1 px-4 py-2 rounded-xl bg-white/20 border border-white/20 
-                              placeholder-white/60 focus:ring-2 focus:ring-indigo-400 outline-none">
+                              placeholder-white/60 focus:ring-2 focus:ring-indigo-400 outline-none"> -->
 
                 <button type="submit"
                         class="bg-indigo-500 hover:bg-indigo-600 px-6 py-2 rounded-xl font-semibold shadow-lg">
@@ -79,6 +89,7 @@
                 </button>
             </form>
         </div>
+        {%endif%}
 
     </div>
 </div>

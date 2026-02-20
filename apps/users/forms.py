@@ -2,6 +2,18 @@ from django import forms
 from .models import *
 from apps.master.utils.inputValidators import *
 
+class SendMessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['content']
+        widgets = {
+            'content':forms.TextInput(attrs={'class':"flex-1 px-4 py-2 rounded-xl bg-white/20 border border-white/20 placeholder-white/60 focus:ring-2 focus:ring-indigo-400 outline-none",
+                                             'placeholder':'Type a Message',
+                                             'maxlength':'300',
+                                             }),
+        }
+
+
 class RegisterForm(forms.ModelForm):
     confirm_password = forms.CharField(required=True,max_length=100)
     class Meta:

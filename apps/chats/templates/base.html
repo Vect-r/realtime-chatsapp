@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <title>{% block title %}Chat App{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js" integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.4" integrity="sha384-1RwI/nvUSrMRuNj7hX1+27J8XDdCoSLf0EjEyF69nacuWyiJYoQ/j39RT1mSnd2G" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
 
     <style>
         body {
@@ -83,9 +86,11 @@
         {% block content %}{% endblock %}
     </main>
 
+    {% if not request.isAuthenticated %}
     <footer class="text-center text-sm text-white/70 py-4">
         Built with Django • Real-time chats coming soon 🚀
     </footer>
+    {%endif%}
 
     <!-- Password Toggle Script -->
     <script>

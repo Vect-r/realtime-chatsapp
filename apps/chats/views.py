@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.db.models import Q
 
 
 from apps.master.auth.utils import login_required_jwt, logout_jwt, hash_password, verify_password, generate_token
@@ -11,19 +12,52 @@ from apps.users.models import *
 # Create your views here.
 @login_required_jwt
 def index(request):
-    users = User.objects.exclude(id=request.authenticated_user.id)
+    return redirect('chats')
 
-    messages = [
-        {"sender": request.authenticated_user, "content": "Hey there 👋"},
-        {"sender": users.first() if users else request.authenticated_user, "content": "Hello!"},
-        {"sender": request.authenticated_user, "content": "This UI looks clean 😎"},
-    ]
+@login_required_jwt
+def chats(request,user_id=None):
+    current_user = request.authenticated_user
+    form = SendMessageForm()
 
-    return render(request, "chat.html", {
-        "users": users,
-        "chat_messages": messages
-    })
-    # return render(request,'index.html')
+    # Sidebar conversations
+    conversations = Conversation.objects.filter(
+        Q(user1=current_user) | Q(user2=current_user)
+    ).select_related('user1', 'user2')
+
+    # print(conversations[0].user1.username,conversations[0].user2.username)
+
+    # Determine selected chat user
+    selected_user = None
+    messages = []
+    conversation = None
+
+    if user_id:
+        selected_user = get_object_or_404(User, id=user_id)
+        conversation = get_or_create_conversation(current_user, selected_user)
+        receiver = get_object_or_404(User, id=user_id)
+
+        messages = Message.objects.filter(
+            conversation=conversation
+        ).select_related('sender').order_by('created_at')
+
+    if request.method == "POST":
+        form = SendMessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.authenticated_user
+            message.receiver = receiver
+            message.conversation = conversation
+            message.save()
+            context={'msg':message}
+            return render(request,'partials/chat-pills-p.html',context)
+
+    context = {
+        "conversations": conversations,
+        "selected_user": selected_user,
+        "chat_messages": messages,
+        "form":form
+    }
+    return render(request, "chat.html", context)
 
 def login(request):
     if request.method=="POST":
