@@ -155,5 +155,33 @@
     window.addEventListener("focus", sendStatus);
     window.addEventListener("blur", sendStatus);
 </script>
+
+<script>
+    function formatLocalTimes() {
+        const timeElements = document.querySelectorAll('time.local-time:not(.formatted)');
+        
+        timeElements.forEach(el => {
+            const utcDate = new Date(el.getAttribute('datetime'));
+            
+            // This formatting perfectly mimics Django's "h:i A"
+            const options = { 
+                hour: 'numeric',   // 'h'
+                minute: '2-digit', // 'i'
+                hour12: true       // 'A'
+            };
+            
+            // Output example: "11:58 PM" in local timezone
+            el.textContent = utcDate.toLocaleTimeString(undefined, options);
+            
+            el.classList.add('formatted');
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", formatLocalTimes);
+
+    document.body.addEventListener("htmx:wsAfterMessage", function() {
+        setTimeout(formatLocalTimes, 10);
+    });
+</script>
 {%endblock%}
 

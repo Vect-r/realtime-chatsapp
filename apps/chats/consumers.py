@@ -9,6 +9,7 @@ from asgiref.sync import sync_to_async
 import json
 from apps.users.models import *
 
+@database_sync_to_async
 def update_user_status_db(user, is_online):
     user.isOnline = is_online
     if not is_online:
