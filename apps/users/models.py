@@ -9,6 +9,8 @@ class User(BaseClass):
     email = models.EmailField(null=False,blank=False,max_length=255)
     isActive = models.BooleanField(default=False)
     bio = models.TextField(max_length=200)
+    isOnline = models.BooleanField(default=False)
+    lastSeen = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.username} -> {self.email}"

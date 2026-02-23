@@ -15,6 +15,8 @@ def chat_date_label(value):
 
     if msg_date == today:
         return "Today"
+
     elif msg_date == yesterday:
         return "Yesterday"
+    print(msg_date)
     return value.strftime("%d %b %Y")

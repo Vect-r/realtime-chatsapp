@@ -1,0 +1,10 @@
+{% load chat_extras %}
+<p id="user-status" class="text-xs {% if selected_user.isOnline %}text-green-300{% else %}text-white/50{% endif %}">
+    {% if selected_user.isOnline %}
+    Online
+    {% elif selected_user.lastSeen  %}
+    Last Seen {{selected_user.lastSeen.date|chat_date_label}} at {{selected_user.lastSeen|date:"h:i A"}}
+    {% else %}
+     Offline
+    {% endif %}
+</p>

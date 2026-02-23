@@ -72,7 +72,8 @@
             </div>
             <div>
                 <p class="font-semibold">{{ selected_user.username }}</p>
-                <p class="text-xs text-green-300">Online</p>
+                {% comment %} <p class="text-xs text-green-300">Online</p> {% endcomment %}
+                {% include 'partials/online_status.html' with selected_user=selected_user %}
             </div>
         </div>
         
@@ -122,18 +123,37 @@
 {% endblock %}
 {% block javascript%}
 <script>
-function scrollChatToBottom() {
-    const container = document.getElementById("chat_messages");
-    if (container) {
-        container.scrollTop = container.scrollHeight;
+    // 1. HTMX Chat Auto-Scrolling
+    function scrollChatToBottom() {
+        const container = document.getElementById("chat_messages");
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
     }
-}
+    document.body.addEventListener("htmx:wsAfterSend", scrollChatToBottom);
+    document.body.addEventListener("htmx:wsAfterMessage", scrollChatToBottom);
 
-// Scroll after sending message
-document.body.addEventListener("htmx:wsAfterSend", scrollChatToBottom);
+    // 2. Global Visibility Tracker
+    const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+    const statusWs = new WebSocket(wsProtocol + window.location.host + "/ws/status/");
+    
+    function sendStatus() {
+        if (statusWs.readyState === WebSocket.OPEN) {
+            // Evaluates to True only if the tab is visible AND the window is clicked into
+            const isActive = document.visibilityState === 'visible' && document.hasFocus();
+            statusWs.send(JSON.stringify({ is_active: isActive }));
+        }
+    }
 
-// Scroll after receiving message via websocket
-document.body.addEventListener("htmx:wsAfterMessage", scrollChatToBottom);
+    // Trigger immediately once the connection opens
+    statusWs.onopen = function() {
+        sendStatus(); 
+    };
+
+    // Listen for tab switching, minimizing, and clicking in/out of the window
+    document.addEventListener("visibilitychange", sendStatus);
+    window.addEventListener("focus", sendStatus);
+    window.addEventListener("blur", sendStatus);
 </script>
 {%endblock%}
 
